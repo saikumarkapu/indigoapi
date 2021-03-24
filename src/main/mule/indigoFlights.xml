@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="6c9e4cf0-71a4-4956-a377-c53b140c02c9" >
+		<http:request-connection host="indigo-airlines.us-e2.cloudhub.io" port="80" />
+	</http:request-config>
+	<flow name="indigoFlightsFlow" doc:id="27eb3ccc-46e4-40ae-bf07-127e159ae816" >
+		<logger level="INFO" doc:name="Logger" doc:id="1bcb70b1-19a5-468e-ab03-c62fb80be131" message="Received the request................... #[attributes.queryParams]"/>
+		<http:request method="GET" doc:name="Request" doc:id="d83b1b39-b8e9-4b00-ad98-b67685b02ef6" config-ref="HTTP_Request_configuration" path="/api/getFlights">
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	from : attributes.queryParams.source,
+	to : attributes.queryParams.destination,
+	depatureDate : attributes.queryParams.doj
+}]]]></http:query-params>
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="e921d416-7df9-4bcb-98f0-db0bf310454c" message="Respone from indigoAirlines is............. #[payload]"/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="673200c3-5759-449b-bd1d-04ecc2cfc1b2" >
+				<ee:transform doc:name="Transform Message" doc:id="6844dafd-896b-46ce-9f06-139b0a3b5909" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+    "statusCode": 500,
+    "message": "unabale to process your request due to target system is down"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+</mule>
