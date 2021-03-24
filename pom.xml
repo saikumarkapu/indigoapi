@@ -34,13 +34,13 @@
                          <uri>https://anypoint.mulesoft.com</uri>            
                          <username>saikumarkapu</username>
                          <password>Saikumar1595</password>
-                         <muleVersion>${app.runtime}</muleVersion>
-                         <applicationName>indigoapi-cloudhub</applicationName>
                          <environment>DEV</environment>
-                         <region>${region}</region>
+                         <applicationName>indigoapi-cloudhub</applicationName> 
+                         <muleVersion>4.3.0</muleVersion>
                          <workers>1</workers>
                         <workerType>MICRO</workerType>
-                        </cloudHubDeployment>			
+                        <objectstoreV2>true</objectstoreV2>
+                     </cloudHubDeployment>			
 				</configuration>
 			</plugin>
 		</plugins>
